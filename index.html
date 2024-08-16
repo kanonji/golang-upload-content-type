@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Content-Type Handling in File Uploads</title>
+</head>
+<body>
+
+<h1>Upload a File</h1>
+<p>Upload a file to see the Content-Type that the client (browser) sends to the server. This will help you understand how different file formats are recognized by the browser.</p>
+<p><input type="file" id="fileInput"></p>
+<p>
+  <button onclick="uploadFileFormData()">Upload using FormData</button>
+  <button onclick="uploadFileDirect()">Upload directly</button>
+</p>
+
+<h2>Server Responses:</h2>
+<div id="responseContainer"></div>
+
+<script>
+function uploadFileFormData() {
+  const fileInput = document.getElementById('fileInput');
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append('file', file);
+
+  fetch('/upload', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.text())
+  .then(data => {
+    data = 'FormData upload: ' + data;
+    console.log(data);
+    appendResponse(data);
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function uploadFileDirect() {
+  const fileInput = document.getElementById('fileInput');
+  const file = fileInput.files[0];
+
+  fetch('/upload', {
+    method: 'POST',
+    headers: {
+      'Content-Type': file.type
+    },
+    body: file
+  })
+  .then(response => response.text())
+  .then(data => {
+    data = 'Direct upload: ' + data;
+    console.log(data);
+    appendResponse(data);
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function appendResponse(responseText) {
+  const responseContainer = document.getElementById('responseContainer');
+  const newResponse = document.createElement('p');
+  newResponse.textContent = responseText;
+  responseContainer.appendChild(newResponse);
+}
+</script>
+
+</body>
+</html>
